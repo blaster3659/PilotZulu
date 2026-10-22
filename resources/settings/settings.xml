@@ -1,0 +1,25 @@
+<settings>
+    <setting propertyKey="@Properties.Theme" title="@Strings.ThemeTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.ThemeCream</listEntry>
+            <listEntry value="1">@Strings.ThemeNight</listEntry>
+            <listEntry value="2">@Strings.ThemeMono</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.LeftArc" title="@Strings.LeftArcTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DataBB</listEntry>
+            <listEntry value="1">@Strings.DataBat</listEntry>
+            <listEntry value="2">@Strings.DataSteps</listEntry>
+            <listEntry value="3">@Strings.DataOff</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.RightArc" title="@Strings.RightArcTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.DataBB</listEntry>
+            <listEntry value="1">@Strings.DataBat</listEntry>
+            <listEntry value="2">@Strings.DataSteps</listEntry>
+            <listEntry value="3">@Strings.DataOff</listEntry>
+        </settingConfig>
+    </setting>
+</settings>

@@ -1,0 +1,14 @@
+<strings>
+    <string id="AppName">Pilot Zulu</string>
+    <string id="SettingsTitle">Pilot Zulu</string>
+    <string id="ThemeTitle">Theme</string>
+    <string id="ThemeCream">Vintage cream + red</string>
+    <string id="ThemeNight">Night (dim) + red</string>
+    <string id="ThemeMono">Mono + red</string>
+    <string id="LeftArcTitle">Left gauge</string>
+    <string id="RightArcTitle">Right gauge</string>
+    <string id="DataBB">Body Battery</string>
+    <string id="DataBat">Watch battery</string>
+    <string id="DataSteps">Step goal</string>
+    <string id="DataOff">Off</string>
+</strings>

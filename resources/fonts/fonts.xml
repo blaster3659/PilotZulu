@@ -1,0 +1,9 @@
+<fonts>
+    <font id="BigTime" filename="BigTime.fnt" antialias="true"/>
+    <font id="ZuluMain" filename="ZuluMain.fnt" antialias="true"/>
+    <font id="ZuluSec" filename="ZuluSec.fnt" antialias="true"/>
+    <font id="Label" filename="Label.fnt" antialias="true"/>
+    <font id="Date" filename="Date.fnt" antialias="true"/>
+    <font id="Home" filename="Home.fnt" antialias="true"/>
+    <font id="Row" filename="Row.fnt" antialias="true"/>
+</fonts>

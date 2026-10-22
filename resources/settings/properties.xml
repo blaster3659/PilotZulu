@@ -1,0 +1,5 @@
+<properties>
+    <property id="Theme" type="number">0</property>
+    <property id="LeftArc" type="number">0</property>
+    <property id="RightArc" type="number">2</property>
+</properties>
