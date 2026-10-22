@@ -8,7 +8,7 @@ A minimal, high-contrast Connect IQ watch face for the **Garmin Forerunner 965**
 
 - **UTC (Zulu) time** with seconds at the top
 - **Large local time** in the centre, date below
-- **Home-base time** (`BKK`, UTC+7) on its own row
+- **Home-city time** on its own row — pick from 29 cities (BKK, SIN, HKG, NRT, SYD, LHR, FRA, CDG, …) or set a custom code + UTC offset. Daylight saving is applied automatically using the watch's time-zone database (CIQ 3.3+); otherwise standard time is used
 - Watch battery %, heart rate (red heart) and steps
 - **Rim:** 60-minute track, cream hour dot + minute dot, red seconds stub (no hands over the digits)
 - **Side gauges** (7–11 and 1–5 o'clock), each selectable: Body Battery · Watch battery · Step goal · **Off**
@@ -28,7 +28,7 @@ Settings can be changed on the watch (long-press the face → Watch Face → Pil
 
 ## Customising
 
-- **Home city / offset:** `HOME_LABEL` and `HOME_UTC_OFFSET_SEC` in `source/PilotZuluView.mc` (the `Home`/`Row` fonts only contain the letters `B` and `K` — add glyphs in `tools/make_fonts.py` if you change the label).
+- **Home city:** choose it in the settings menu. To add cities, extend `CITY_CODES` / `CITY_LAT` / `CITY_LON` / `CITY_STD_MIN` in `source/PilotZuluView.mc`, plus a `City…` string, a `listEntry` in `resources/settings/settings.xml` and an entry in `CITY_NAMES` in `source/PilotZuluApp.mc` (keep the same order, Custom last).
 - **Fonts** are pre-rendered bitmap fonts from Barlow Condensed. Regenerate with `python3 tools/make_fonts.py` (needs Pillow and the TTFs in `./fonts`).
 - Layout coordinates are in a 454-px design space, scaled by `s = width / 454`.
 

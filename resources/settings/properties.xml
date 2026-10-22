@@ -2,4 +2,7 @@
     <property id="Theme" type="number">0</property>
     <property id="LeftArc" type="number">0</property>
     <property id="RightArc" type="number">2</property>
+    <property id="HomeCity" type="number">0</property>
+    <property id="CustomLabel" type="string">UTC</property>
+    <property id="CustomOffset" type="float">0.0</property>
 </properties>

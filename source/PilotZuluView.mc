@@ -4,6 +4,7 @@ import Toybox.Application;
 import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.Math;
+import Toybox.Position;
 import Toybox.SensorHistory;
 import Toybox.System;
 import Toybox.Time;
@@ -12,14 +13,20 @@ import Toybox.WatchUi;
 
 // Pilot Zulu — Minimal Zulu watch face for Forerunner 965 (454x454 AMOLED).
 // Rim: 60-minute track, big dot = hour, small dot = minute, red stub = seconds.
-// Centre: ZULU HH:MM:ss, large local time, date, BKK home time.
-// Below: date, then watch battery + heart/HR flanking a short divider, BKK home time, steps.
+// Centre: UTC HH:MM:ss, large local time, date, home-city time (default BKK).
+// Below: date, then watch battery + heart/HR flanking a short divider, home-city time, steps.
 // Side gauges (7->11 and 5->1, filling upward) show user-selectable data: Body Battery, watch battery, step goal.
-// Settings (watch menu or phone app): Theme 0 cream/1 night/2 mono; LeftArc/RightArc 0 BB/1 BAT/2 STEP/3 Off.
+// Settings (watch menu or phone app): Theme 0 cream/1 night/2 mono; LeftArc/RightArc 0 BB/1 BAT/2 STEP/3 Off;
+// HomeCity (index into CITY_CODES, last = Custom with CustomLabel + CustomOffset hours).
 class PilotZuluView extends WatchUi.WatchFace {
 
-    const HOME_UTC_OFFSET_SEC = 7 * 3600;   // Bangkok, UTC+7, no DST
-    const HOME_LABEL = "BKK";
+    // Home city table (index = HomeCity setting). Offsets are standard-time minutes, used only when
+    // Gregorian.localMoment is unavailable; otherwise the watch's own tz database applies DST.
+    const CITY_CODES = ["BKK", "HKT", "CNX", "SIN", "KUL", "CGK", "MNL", "HKG", "TPE", "PVG", "PEK", "ICN", "NRT", "KIX", "DEL", "BOM", "DXB", "SYD", "MEL", "PER", "LHR", "CDG", "FRA", "MUC", "ZRH", "CPH", "ARN", "OSL", "IST"];
+    const CITY_LAT = [13.69, 8.11, 18.77, 1.36, 2.75, -6.13, 14.51, 22.31, 25.08, 31.14, 40.08, 37.46, 35.77, 34.43, 28.56, 19.09, 25.25, -33.94, -37.67, -31.94, 51.47, 49.01, 50.04, 48.35, 47.46, 55.62, 59.65, 60.19, 41.26];
+    const CITY_LON = [100.75, 98.31, 98.96, 103.99, 101.71, 106.66, 121.02, 113.91, 121.23, 121.81, 116.58, 126.44, 140.39, 135.24, 77.1, 72.87, 55.36, 151.18, 144.84, 115.97, -0.45, 2.55, 8.56, 11.79, 8.55, 12.65, 17.92, 11.1, 28.74];
+    const CITY_STD_MIN = [420, 420, 420, 480, 480, 420, 480, 480, 480, 480, 480, 540, 540, 540, 330, 330, 240, 600, 600, 480, 0, 60, 60, 60, 60, 60, 60, 60, 180];
+    const CITY_CUSTOM = 29;
     const DATA_OFF = 3;                     // LeftArc/RightArc: 0 BB, 1 BAT, 2 STEP, 3 Off
     const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
     const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -44,6 +51,11 @@ class PilotZuluView extends WatchUi.WatchFace {
     var _fHome;
     var _leftData = 0;
     var _rightData = 2;
+    var _city = 0;
+    var _customLabel = "UTC";
+    var _customOffSec = 0;
+    var _homeOffSec = 7 * 3600;
+    var _homeOffMinute = -1;            // minute of the cached _homeOffSec (re-evaluated once a minute)
 
     function initialize() {
         WatchFace.initialize();
@@ -72,6 +84,59 @@ class PilotZuluView extends WatchUi.WatchFace {
         _pal = THEMES[t];
         _leftData = readChoice("LeftArc", 0);
         _rightData = readChoice("RightArc", 2);
+        _city = readNumber("HomeCity", 0, CITY_CUSTOM);
+        _customLabel = "UTC";
+        _customOffSec = 0;
+        try {
+            var lbl = Application.Properties.getValue("CustomLabel");
+            if (lbl != null && (lbl as String).length() > 0) {
+                _customLabel = (lbl as String).toUpper();
+                if (_customLabel.length() > 4) { _customLabel = _customLabel.substring(0, 4); }
+            }
+            var off = Application.Properties.getValue("CustomOffset");
+            if (off instanceof Number || off instanceof Float) {
+                var h = (off as Numeric).toFloat();
+                if (h >= -12.0 && h <= 14.0) { _customOffSec = (h * 3600).toNumber(); }
+            }
+        } catch (e) {
+            _customLabel = "UTC";
+        }
+        _homeOffMinute = -1;
+    }
+
+    function readNumber(key, dflt, max) {
+        var v = dflt;
+        try {
+            var p = Application.Properties.getValue(key);
+            if (p != null) { v = p as Number; }
+        } catch (e) {
+            v = dflt;
+        }
+        if (v < 0 || v > max) { v = dflt; }
+        return v;
+    }
+
+    function homeLabel() as String {
+        return (_city == CITY_CUSTOM) ? _customLabel : CITY_CODES[_city];
+    }
+
+    // UTC offset (seconds) of the home city right now, DST included when the device supports localMoment.
+    function homeOffset(now as Time.Moment, minute) as Number {
+        if (_city == CITY_CUSTOM) { return _customOffSec; }
+        if (minute == _homeOffMinute) { return _homeOffSec; }
+        var off = CITY_STD_MIN[_city] * 60;
+        try {
+            if (Gregorian has :localMoment) {
+                var loc = new Position.Location({:latitude => CITY_LAT[_city], :longitude => CITY_LON[_city], :format => :degrees});
+                var lm = Gregorian.localMoment(loc, now);
+                if (lm != null) { off = lm.getOffset(); }
+            }
+        } catch (e) {
+            off = CITY_STD_MIN[_city] * 60;
+        }
+        _homeOffSec = off;
+        _homeOffMinute = minute;
+        return off;
     }
 
     function readChoice(key, dflt) {
@@ -110,7 +175,7 @@ class PilotZuluView extends WatchUi.WatchFace {
         var now = Time.now();
         var clock = System.getClockTime();
         var utc = Gregorian.utcInfo(now, Time.FORMAT_SHORT);
-        var home = Gregorian.utcInfo(now.add(new Time.Duration(HOME_UTC_OFFSET_SEC)), Time.FORMAT_SHORT);
+        var home = Gregorian.utcInfo(now.add(new Time.Duration(homeOffset(now, clock.min))), Time.FORMAT_SHORT);
         var date = Gregorian.info(now, Time.FORMAT_SHORT);
 
         if (_sleeping) {
@@ -189,9 +254,9 @@ class PilotZuluView extends WatchUi.WatchFace {
         dc.drawText(cx + 81 * s, rowY, _fRow, (hr != null) ? hr.format("%d") : "--",
             Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
 
-        // BKK home time on its own row, then steps
+        // Home-city time on its own row, then steps
         drawCentered(dc, cx, 355 * s, _fHome,
-            HOME_LABEL + " " + home.hour.format("%02d") + ":" + home.min.format("%02d"), _pal[SUB]);
+            homeLabel() + " " + home.hour.format("%02d") + ":" + home.min.format("%02d"), _pal[SUB]);
         drawCentered(dc, cx, 389 * s, _fRow, withCommas(steps), _pal[INFO]);
 
         // Hour / minute dots and seconds stub on the rim

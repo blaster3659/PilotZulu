@@ -22,7 +22,7 @@ FONTS = [
     ("ZuluSec",   "BarlowCondensed-SemiBold.ttf",  30, DIGITS),
     ("Label",     "BarlowCondensed-Medium.ttf",    20, DIGITS + UPPER + " ,%-"),
     ("Date",      "BarlowCondensed-SemiBold.ttf",  22, DIGITS + UPPER + " "),
-    ("Home",      "BarlowCondensed-Bold.ttf",      25, DIGITS + "BK "),
+    ("Home",      "BarlowCondensed-Bold.ttf",      25, DIGITS + UPPER + " "),
     ("Row",       "BarlowCondensed-SemiBold.ttf",  25, DIGITS + "BK ,%-"),
 ]
 

@@ -31,11 +31,21 @@ class PilotZuluApp extends Application.AppBase {
 // ---- on-watch settings menus ------------------------------------------
 
 const THEME_NAMES = [Rez.Strings.ThemeCream, Rez.Strings.ThemeNight, Rez.Strings.ThemeMono];
+const CITY_NAMES = [
+    Rez.Strings.CityBKK, Rez.Strings.CityHKT, Rez.Strings.CityCNX, Rez.Strings.CitySIN, Rez.Strings.CityKUL,
+    Rez.Strings.CityCGK, Rez.Strings.CityMNL, Rez.Strings.CityHKG, Rez.Strings.CityTPE, Rez.Strings.CityPVG,
+    Rez.Strings.CityPEK, Rez.Strings.CityICN, Rez.Strings.CityNRT, Rez.Strings.CityKIX, Rez.Strings.CityDEL,
+    Rez.Strings.CityBOM, Rez.Strings.CityDXB, Rez.Strings.CitySYD, Rez.Strings.CityMEL, Rez.Strings.CityPER,
+    Rez.Strings.CityLHR, Rez.Strings.CityCDG, Rez.Strings.CityFRA, Rez.Strings.CityMUC, Rez.Strings.CityZRH,
+    Rez.Strings.CityCPH, Rez.Strings.CityARN, Rez.Strings.CityOSL, Rez.Strings.CityIST,
+    Rez.Strings.CityCustom];
 const DATA_NAMES = [Rez.Strings.DataBB, Rez.Strings.DataBat, Rez.Strings.DataSteps, Rez.Strings.DataOff];
 
 function currentChoice(key as String, dflt as Number) as Number {
     var v = Application.Properties.getValue(key);
-    return (v != null) ? (v as Number) : dflt;
+    var n = (v != null) ? (v as Number) : dflt;
+    var max = key.equals("HomeCity") ? CITY_NAMES.size() : (key.equals("Theme") ? THEME_NAMES.size() : DATA_NAMES.size());
+    return (n >= 0 && n < max) ? n : dflt;
 }
 
 function buildMainMenu() as WatchUi.Menu2 {
@@ -46,6 +56,8 @@ function buildMainMenu() as WatchUi.Menu2 {
         WatchUi.loadResource(DATA_NAMES[currentChoice("LeftArc", 0)]), "LeftArc", null));
     menu.addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RightArcTitle),
         WatchUi.loadResource(DATA_NAMES[currentChoice("RightArc", 2)]), "RightArc", null));
+    menu.addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.HomeCityTitle),
+        WatchUi.loadResource(CITY_NAMES[currentChoice("HomeCity", 0)]), "HomeCity", null));
     return menu;
 }
 
@@ -75,6 +87,8 @@ class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
             menu = buildChoiceMenu(key, Rez.Strings.ThemeTitle, THEME_NAMES, 0);
         } else if (key.equals("LeftArc")) {
             menu = buildChoiceMenu(key, Rez.Strings.LeftArcTitle, DATA_NAMES, 0);
+        } else if (key.equals("HomeCity")) {
+            menu = buildChoiceMenu(key, Rez.Strings.HomeCityTitle, CITY_NAMES, 0);
         } else {
             menu = buildChoiceMenu(key, Rez.Strings.RightArcTitle, DATA_NAMES, 2);
         }

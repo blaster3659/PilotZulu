@@ -22,4 +22,44 @@
             <listEntry value="3">@Strings.DataOff</listEntry>
         </settingConfig>
     </setting>
+    <setting propertyKey="@Properties.HomeCity" title="@Strings.HomeCityTitle">
+        <settingConfig type="list">
+            <listEntry value="0">@Strings.CityBKK</listEntry>
+            <listEntry value="1">@Strings.CityHKT</listEntry>
+            <listEntry value="2">@Strings.CityCNX</listEntry>
+            <listEntry value="3">@Strings.CitySIN</listEntry>
+            <listEntry value="4">@Strings.CityKUL</listEntry>
+            <listEntry value="5">@Strings.CityCGK</listEntry>
+            <listEntry value="6">@Strings.CityMNL</listEntry>
+            <listEntry value="7">@Strings.CityHKG</listEntry>
+            <listEntry value="8">@Strings.CityTPE</listEntry>
+            <listEntry value="9">@Strings.CityPVG</listEntry>
+            <listEntry value="10">@Strings.CityPEK</listEntry>
+            <listEntry value="11">@Strings.CityICN</listEntry>
+            <listEntry value="12">@Strings.CityNRT</listEntry>
+            <listEntry value="13">@Strings.CityKIX</listEntry>
+            <listEntry value="14">@Strings.CityDEL</listEntry>
+            <listEntry value="15">@Strings.CityBOM</listEntry>
+            <listEntry value="16">@Strings.CityDXB</listEntry>
+            <listEntry value="17">@Strings.CitySYD</listEntry>
+            <listEntry value="18">@Strings.CityMEL</listEntry>
+            <listEntry value="19">@Strings.CityPER</listEntry>
+            <listEntry value="20">@Strings.CityLHR</listEntry>
+            <listEntry value="21">@Strings.CityCDG</listEntry>
+            <listEntry value="22">@Strings.CityFRA</listEntry>
+            <listEntry value="23">@Strings.CityMUC</listEntry>
+            <listEntry value="24">@Strings.CityZRH</listEntry>
+            <listEntry value="25">@Strings.CityCPH</listEntry>
+            <listEntry value="26">@Strings.CityARN</listEntry>
+            <listEntry value="27">@Strings.CityOSL</listEntry>
+            <listEntry value="28">@Strings.CityIST</listEntry>
+            <listEntry value="29">@Strings.CityCustom</listEntry>
+        </settingConfig>
+    </setting>
+    <setting propertyKey="@Properties.CustomLabel" title="@Strings.CustomLabelTitle">
+        <settingConfig type="alphaNumeric" maxLength="4"/>
+    </setting>
+    <setting propertyKey="@Properties.CustomOffset" title="@Strings.CustomOffsetTitle">
+        <settingConfig type="numeric" min="-12" max="14"/>
+    </setting>
 </settings>
